@@ -28,7 +28,7 @@ filtered_DOdata$Year <- lubridate::year(filtered_DOdata$Date)
 
 DOplot<- ggplot(filtered_DOdata, aes(x = Date, y = DO, colour = site, group = Year)) +
   geom_point(position = position_jitter(h = 0.1, w = 0.1), shape = 21, alpha = 0.5, size = 1.1) +
-  scale_x_datetime(date_labels = "%e-%b", date_breaks = "10 days") +
+  scale_x_datetime(date_labels = "%e-%b", date_breaks = "5 days") +
   xlab("") + ylim(0,25) +
   ylab("Dissolved Oxygen (mg/l)") +
   facet_wrap(~ Year, ncol = 1, scales = "free_x") +
@@ -66,7 +66,11 @@ pHPlot<- ggplot(data=filtered_pH,aes(x=Date, y=pH,
   scale_x_datetime(date_labels= "%e-%b", date_breaks="5 days")+
   xlab("")+
   ylab("pH")+ facet_wrap(~ Year, nrow=2, ncol =1, scales = "free_x") +
-  theme_classic()
+  theme_classic() +
+  theme(
+    strip.background = element_rect(fill = "#2c3e50", color = "#2c3e50"),
+    strip.text = element_text(color = "white", size = 14, face = "bold")
+  )
 ggplotly(pHPlot)
 
 ```
@@ -81,22 +85,26 @@ ggplotly(pHPlot)
 tempdata<- readr::read_csv("https://raw.githubusercontent.com/GSTsalmon/CowichanData/refs/heads/main/temp.csv")
 
 tempdata$Date = as.POSIXct(tempdata$Date, format = "%m/%d/%Y %H:%M")
-
-tempdata$site <- factor(tempdata$site, levels = c("Saysells","70.2 Trestle","HSB", "US.JUB","DS.JUB"))
+tempdata$site[tempdata$site=="Trestle"]<-"70.2 Trestle"
+tempdata$site <- factor(tempdata$site, levels = c("Saysells","70.2 Trestle","HSB"))
 tempdata$Year <- lubridate::year(tempdata$Date)
 
 
-filteredtempdata <- filter(tempdata, temp != "NA" & site != 'na')
+filteredtempdata <- filter(tempdata, temp != "NA" & site != 'na' & Year != 'na')
 
 
 TempPlot<- ggplot(data=filteredtempdata,aes(x=Date, y=temp,
-                     colour=site, group = Year))+
+                                     colour=site, group=Year))+
   geom_point(position=position_jitter(h=0.1, w=0.1),
              shape = 21, alpha = 0.5, size = 0.5)+
   scale_x_datetime(date_labels= "%e-%b", date_breaks="5 days")+
   xlab("")+
-  ylab("Temp(C)")+
-  theme_classic()
+  ylab("Temperature")+ facet_wrap(~ Year, nrow=2, ncol =1, scales = "free_x") +
+  theme_classic() +
+  theme(
+    strip.background = element_rect(fill = "#2c3e50", color = "#2c3e50"),
+    strip.text = element_text(color = "white", size = 14, face = "bold")
+  )
 ggplotly(TempPlot)
 ```
 
